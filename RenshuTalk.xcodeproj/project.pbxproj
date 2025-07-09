@@ -29,9 +29,22 @@
 		18C93D0B2E1646F0000FCF3B /* RenshuTalkUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RenshuTalkUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		18BCE6352E1654DE000990C6 /* Exceptions for "RenshuTalk" folder in "RenshuTalk" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 18C93CF32E1646EE000FCF3B /* RenshuTalk */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		18C93CF62E1646EE000FCF3B /* RenshuTalk */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				18BCE6352E1654DE000990C6 /* Exceptions for "RenshuTalk" folder in "RenshuTalk" target */,
+			);
 			path = RenshuTalk;
 			sourceTree = "<group>";
 		};
@@ -397,6 +410,8 @@
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = RenshuTalk/Info.plist;
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "We need access microphone to recoder your voice";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -424,6 +439,8 @@
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = RenshuTalk/Info.plist;
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "We need access microphone to recoder your voice";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
