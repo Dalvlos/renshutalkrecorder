@@ -30,7 +30,7 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		18BCE6352E1654DE000990C6 /* Exceptions for "RenshuTalk" folder in "RenshuTalk" target */ = {
+		188663AA2E22978E00ED060F /* Exceptions for "RenshuTalk" folder in "RenshuTalk" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
@@ -43,7 +43,7 @@
 		18C93CF62E1646EE000FCF3B /* RenshuTalk */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				18BCE6352E1654DE000990C6 /* Exceptions for "RenshuTalk" folder in "RenshuTalk" target */,
+				188663AA2E22978E00ED060F /* Exceptions for "RenshuTalk" folder in "RenshuTalk" target */,
 			);
 			path = RenshuTalk;
 			sourceTree = "<group>";
