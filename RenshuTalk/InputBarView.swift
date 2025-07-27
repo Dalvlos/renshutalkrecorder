@@ -10,32 +10,36 @@ import SwiftUI
 
 struct InputBarView: View {
     @ObservedObject var viewModel: FraseViewModel
-    
+
     var body: some View {
         VStack {
-            TextField("Digite uma frase...", text: $viewModel.inputText)
+            TextField("Write a phrase...", text: $viewModel.inputText)
                 .textFieldStyle(.roundedBorder)
                 .padding(.horizontal)
 
             HStack(spacing: 20) {
+                // Botão de Gravação
                 Button(action: {
                     viewModel.toggleRecording()
                 }) {
                     Label(
-                        viewModel.isRecording ? "Parar gravação" : "Gravar áudio",
+                        viewModel.isRecording ? "Stop" : "REC",
                         systemImage: viewModel.isRecording ? "stop.circle.fill" : "mic.circle.fill"
                     )
                 }
                 .buttonStyle(.bordered)
                 .tint(viewModel.isRecording ? .red : .blue)
+                .disabled(viewModel.inputText.trimmingCharacters(in: .whitespaces).isEmpty)
 
+                // Botão de Salvar
                 Button(action: {
                     viewModel.salvarFrase()
                 }) {
-                    Label("Salvar frase", systemImage: "square.and.arrow.down")
+                    Label("Save", systemImage: "square.and.arrow.down")
                 }
                 .buttonStyle(.borderedProminent)
                 .tint(.green)
+                .disabled(viewModel.inputText.trimmingCharacters(in: .whitespaces).isEmpty)
             }
             .padding(.horizontal)
         }
