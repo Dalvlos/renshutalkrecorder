@@ -31,15 +31,6 @@ struct InputBarView: View {
                 .tint(viewModel.isRecording ? .red : .blue)
                 .disabled(viewModel.inputText.trimmingCharacters(in: .whitespaces).isEmpty)
 
-                // Botão de Salvar
-                Button(action: {
-                    viewModel.salvarFrase()
-                }) {
-                    Label("Save", systemImage: "square.and.arrow.down")
-                }
-                .buttonStyle(.borderedProminent)
-                .tint(.green)
-                .disabled(viewModel.inputText.trimmingCharacters(in: .whitespaces).isEmpty)
             }
             .padding(.horizontal)
         }

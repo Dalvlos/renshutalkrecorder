@@ -22,6 +22,7 @@ class FraseViewModel: ObservableObject {
         if isRecording {
             recorder.stopRecording()
             isRecording = false
+            salvarFrase()
         } else {
             recorder.startRecording(for: filename)
             isRecording = true
