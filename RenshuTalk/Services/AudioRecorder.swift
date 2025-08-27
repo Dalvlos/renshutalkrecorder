@@ -14,7 +14,6 @@ class AudioRecorder: NSObject, ObservableObject {
 
     func startRecording(for filename: String) {
         let path = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-        // Defina uma extensão de arquivo .m4a (ou .caf se preferir)
         let fileURL = path.appendingPathComponent(filename).appendingPathExtension("m4a")
 
         let settings: [String: Any] = [
@@ -25,9 +24,10 @@ class AudioRecorder: NSObject, ObservableObject {
         ]
 
         do {
-            // Configurar a sessão antes de gravar
             let session = AVAudioSession.sharedInstance()
-            try session.setCategory(.playAndRecord, mode: .default, options: [.defaultToSpeaker])
+
+            // Configuração para gravar e reproduzir, respeitando bluetooth se disponível
+            try session.setCategory(.playAndRecord, mode: .voiceChat, options: [.allowBluetooth, .allowBluetoothA2DP])
             try session.setActive(true)
 
             recordingURL = fileURL
@@ -52,4 +52,5 @@ class AudioRecorder: NSObject, ObservableObject {
         }
     }
 }
+
 
