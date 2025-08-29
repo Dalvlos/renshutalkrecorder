@@ -13,5 +13,6 @@ struct RenshuTalkApp: App {
         WindowGroup {
             ContentView()
         }
+        
     }
 }

@@ -20,6 +20,7 @@ struct FraseListView: View {
                     viewModel.playAudio(named: viewModel.frases[index].audioFileName)
                 }
             }
+
             .swipeActions {
                 Button(role: .destructive) {
                     viewModel.deleteFrase(at: index)

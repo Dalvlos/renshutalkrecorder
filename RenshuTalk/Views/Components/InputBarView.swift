@@ -32,6 +32,7 @@ struct InputBarView: View {
                 .disabled(viewModel.inputText.trimmingCharacters(in: .whitespaces).isEmpty)
 
             }
+
             .padding(.horizontal)
         }
     }
