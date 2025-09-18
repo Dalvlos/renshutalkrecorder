@@ -5,7 +5,6 @@
 //  Created by Dalvlos on 2025/07/03.
 //
 
-
 import SwiftUI
 
 extension UIApplication {
@@ -77,7 +76,7 @@ struct ContentView: View {
                 FraseListView(viewModel: viewModel)
             }
             .ignoresSafeArea(.keyboard)
-            .navigationTitle("Write And Recorder")
+            .navigationTitle("Write and Recorder")
             .navigationBarTitleDisplayMode(.inline)
             .onAppear {
                 viewModel.loadFrases()
@@ -90,7 +89,7 @@ struct ContentView: View {
     
     // Função que ajusta o tamanho da fonte
     private func fontSize(for text: String) -> CGFloat {
-        return 20
+        return 28
     }
     
     // Função que quebra cada linha em pedaços de tamanho máximo
