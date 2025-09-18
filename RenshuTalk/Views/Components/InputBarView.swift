@@ -5,7 +5,7 @@
 //  Created by Dalvlos on 2025/07/12.
 //
 
-
+/*
 import SwiftUI
 
 struct InputBarView: View {
@@ -30,6 +30,7 @@ struct InputBarView: View {
                 .buttonStyle(.bordered)
                 .tint(viewModel.isRecording ? .red : .blue)
                 .disabled(viewModel.inputText.trimmingCharacters(in: .whitespaces).isEmpty)
+                .padding()
 
             }
 
@@ -37,3 +38,4 @@ struct InputBarView: View {
         }
     }
 }
+*/

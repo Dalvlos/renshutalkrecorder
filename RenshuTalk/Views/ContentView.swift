@@ -44,44 +44,16 @@ struct ContentView: View {
                 }
                 .frame(maxHeight: UIScreen.main.bounds.width) // limita a 1:1
                 
-                // --- Área 2: Menu acima da lista ---
-                HStack(spacing: 20) {
-                    // Botão de Gravação
-                    Button(action: {
-                        viewModel.toggleRecording()
-                    }) {
-                        Label(
-                            viewModel.isRecording ? "Stop" : "REC",
-                            systemImage: viewModel.isRecording ? "stop.circle.fill" : "mic.circle.fill"
-                        )
-                    }
-                    .buttonStyle(.bordered)
-                    .tint(viewModel.isRecording ? .red : .blue)
-                    .disabled(viewModel.inputText.trimmingCharacters(in: .whitespaces).isEmpty)
 
                 }
 
-                HStack {
-                    Button(action: {
-                        // Ação de "Play All"
-                        //viewModel.playAll()
-                    }) {
-                        Label("Play All", systemImage: "play.fill")
-                    }
-                    
-                    Spacer()
-                    
-                    Button(action: {
-                        // Ação de "Nova Lista"
-                        //viewModel.createNewPlaylist()
-                    }) {
-                        Label("New list", systemImage: "plus.circle")
-                    }
-                }
+              
                 .padding(.horizontal)
                 
                 // --- Área 3: Lista de frases ---
+            
                 FraseListView(viewModel: viewModel)
+                PlayAndListView(viewModel: viewModel)
             }
             .ignoresSafeArea(.keyboard)
             .navigationTitle("RenshuTalk")
@@ -109,6 +81,5 @@ struct ContentView: View {
         
     }
 
-}
 
 
