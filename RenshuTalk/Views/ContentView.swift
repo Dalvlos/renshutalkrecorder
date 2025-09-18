@@ -5,6 +5,7 @@
 //  Created by Dalvlos on 2025/07/03.
 //
 
+
 import SwiftUI
 
 extension UIApplication {
@@ -25,61 +26,92 @@ struct ContentView: View {
                 GeometryReader { geometry in
                     ZStack {
                         Rectangle()
-                            .fill(Color.gray.opacity(0.1))
+                            .fill(Color.black.opacity(0.1))
                             .aspectRatio(1, contentMode: .fit)
                             .cornerRadius(16)
                             .shadow(radius: 3)
                         
-                        // Texto digitado diretamente na tela 1:1
-                        CenteredTextEditor(text: $viewModel.inputText,
-                                                   fontSize: fontSize(for: viewModel.inputText))
-                                    .frame(width: geometry.size.width,
-                                           height: geometry.size.width,
-                                           alignment: .center)
-                                    .background(Color.clear)
+                        CenteredTextEditor(
+                            text: $viewModel.inputText,
+                            fontSize: fontSize(for: viewModel.inputText)
+                        )
+                        .onChange(of: viewModel.inputText) { oldValue, newValue in
+                            let maxCharsPerLine = 28
+                            let formatted = wrapLines(newValue, maxCharsPerLine: maxCharsPerLine)
+                            
+                            // Atualiza o texto fora do ciclo de renderização
+                            if formatted != newValue {
+                                DispatchQueue.main.async {
+                                    viewModel.inputText = formatted
+                                }
+                            }
+                        }
+                        .frame(
+                            width: geometry.size.width,
+                            height: geometry.size.width,
+                            alignment: .center
+                        )
+                        .background(Color.white)
                     }
-                    
-                    .frame(height: geometry.size.width) // altura = largura -> 1:1
-                    
+                    .frame(height: geometry.size.width)
                 }
-                .frame(maxHeight: UIScreen.main.bounds.width) // limita a 1:1
+                .frame(maxHeight: UIScreen.main.bounds.width)
                 
-
+                // --- Área 2: Menu acima da lista ---
+                HStack(spacing: 20) {
+                    // Botão de Gravação
+                    Button(action: {
+                        viewModel.toggleRecording()
+                    }) {
+                        Label(
+                            viewModel.isRecording ? "Stop" : "REC",
+                            systemImage: viewModel.isRecording ? "stop.circle.fill" : "mic.circle.fill"
+                        )
+                    }
+                    .buttonStyle(.bordered)
+                    .tint(viewModel.isRecording ? .red : .blue)
+                    .disabled(viewModel.inputText.trimmingCharacters(in: .whitespaces).isEmpty)
                 }
-
-              
-                .padding(.horizontal)
                 
                 // --- Área 3: Lista de frases ---
-            
                 FraseListView(viewModel: viewModel)
-                PlayAndListView(viewModel: viewModel)
             }
             .ignoresSafeArea(.keyboard)
-            .navigationTitle("RenshuTalk")
+            .navigationTitle("Write And Recorder")
             .navigationBarTitleDisplayMode(.inline)
-            .onAppear
-            {
+            .onAppear {
                 viewModel.loadFrases()
             }
             .onTapGesture {
                 UIApplication.shared.hideKeyboard()
             }
         }
-    
     }
-
     
-    // Função que ajusta o tamanho da fonte com base no tamanho do texto
+    // Função que ajusta o tamanho da fonte
     private func fontSize(for text: String) -> CGFloat {
-        switch text.count {
-        case 0...50: return 32
-        case 51...120: return 24
-        case 121...200: return 18
-        default: return 14
+        return 20
+    }
+    
+    // Função que quebra cada linha em pedaços de tamanho máximo
+    private func wrapLines(_ text: String, maxCharsPerLine: Int) -> String {
+        // Preserva linhas existentes
+        let lines = text.split(separator: "\n", omittingEmptySubsequences: false).map(String.init)
+        var wrappedLines: [String] = []
+        
+        for line in lines {
+            var current = line
+            // Quebra linhas maiores que maxCharsPerLine
+            while current.count > maxCharsPerLine {
+                let splitIndex = current.index(current.startIndex, offsetBy: maxCharsPerLine)
+                let chunk = String(current[..<splitIndex])
+                wrappedLines.append(chunk)
+                current = String(current[splitIndex...])
+            }
+            // Adiciona o que restou da linha (pode ser vazio)
+            wrappedLines.append(current)
         }
         
+        return wrappedLines.joined(separator: "\n")
     }
-
-
-
+}

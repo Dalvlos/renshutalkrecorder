@@ -16,9 +16,14 @@ struct FraseListView: View {
             VStack(alignment: .leading) {
                 Text(viewModel.frases[index].texto)
                     .font(.headline)
-                Button("Ouvir áudio") {
+                Button(action: {
                     viewModel.playAudio(named: viewModel.frases[index].audioFileName)
+                }) {
+                    Image(systemName: "play.fill") // ícone de play preenchido
+                        .font(.title2)             // ajusta o tamanho do ícone
+                        .foregroundColor(.blue)    // cor do ícone
                 }
+
             }
 
             .swipeActions {
