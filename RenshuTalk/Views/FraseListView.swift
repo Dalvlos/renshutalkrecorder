@@ -19,9 +19,9 @@ struct FraseListView: View {
                 Button(action: {
                     viewModel.playAudio(named: viewModel.frases[index].audioFileName)
                 }) {
-                    Image(systemName: "play.fill") // ícone de play preenchido
-                        .font(.title2)             // ajusta o tamanho do ícone
-                        .foregroundColor(.blue)    // cor do ícone
+                    Image(systemName: "play.fill") 
+                        .font(.title2)
+                        .foregroundColor(.blue)
                 }
 
             }

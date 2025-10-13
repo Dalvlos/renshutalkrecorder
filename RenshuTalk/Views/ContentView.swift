@@ -38,7 +38,7 @@ struct ContentView: View {
                             let maxCharsPerLine = 28
                             let formatted = wrapLines(newValue, maxCharsPerLine: maxCharsPerLine)
                             
-                            // Atualiza o texto fora do ciclo de renderização
+                            
                             if formatted != newValue {
                                 DispatchQueue.main.async {
                                     viewModel.inputText = formatted
@@ -50,7 +50,10 @@ struct ContentView: View {
                             height: geometry.size.width,
                             alignment: .center
                         )
-                        .background(Color.white)
+                        .background(Color.black)
+                        .cornerRadius(12)
+                        .shadow(radius: 5)
+                        
                     }
                     .frame(height: geometry.size.width)
                 }

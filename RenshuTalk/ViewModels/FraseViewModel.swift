@@ -95,7 +95,7 @@ class FraseViewModel: NSObject, ObservableObject, AVAudioPlayerDelegate {
         }
     }
 
-    // Para parar qualquer reprodução em andamento
+    
     func stopPlayback() {
         audioPlayer?.stop()
         audioPlayer = nil
