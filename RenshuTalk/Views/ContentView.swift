@@ -5,23 +5,60 @@
 //  Created by Dalvlos on 2025/07/03.
 //
 
-import SwiftUI
+//
+//  ContentView.swift
+//  RenshuTalk
+//
+//  Atualizado para suportar seleção/ criação de playlists.
+//
 
-extension UIApplication {
-    func hideKeyboard() {
-        sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
-    }
-}
+import SwiftUI
 
 struct ContentView: View {
     @StateObject private var viewModel = FraseViewModel()
     @State private var isMenuOpen = false
-    
+    @State private var showNewPlaylistSheet = false
+    @State private var showManagePlaylists = false
+
     var body: some View {
         NavigationView {
             VStack(spacing: 16) {
-                
-                // --- Área 1: Tela 1:1 estilo Instagram ---
+
+                // Top bar: seleção de lista + nova lista
+                HStack(spacing: 12) {
+                    Menu {
+                        // mostra todas as playlists
+                        ForEach(viewModel.library.playlists, id: \.id) { playlist in
+                            Button(action: {
+                                viewModel.selectPlaylist(id: playlist.id)
+                            }) {
+                                Text(playlist.name)
+                            }
+                        }
+                        Divider()
+                        Button(action: { showNewPlaylistSheet = true }) {
+                            Label("Nova lista", systemImage: "plus")
+                        }
+                        Button(action: { showManagePlaylists = true }) {
+                            Label("Gerenciar listas", systemImage: "square.stack")
+                        }
+                    } label: {
+                        HStack {
+                            Text(viewModel.activePlaylistName)
+                                .fontWeight(.semibold)
+                            Image(systemName: "chevron.down")
+                        }
+                        .padding(.vertical, 8)
+                        .padding(.horizontal, 12)
+                        .background(Color(.secondarySystemBackground))
+                        .cornerRadius(10)
+                    }
+
+                    Spacer()
+                }
+                .padding(.horizontal)
+
+                // --- Área 1: Tela 1:1 estilo Instagram (mantive o seu layout) ---
                 GeometryReader { geometry in
                     ZStack {
                         Rectangle()
@@ -29,22 +66,11 @@ struct ContentView: View {
                             .aspectRatio(1, contentMode: .fit)
                             .cornerRadius(16)
                             .shadow(radius: 3)
-                        
+
                         CenteredTextEditor(
                             text: $viewModel.inputText,
                             fontSize: fontSize(for: viewModel.inputText)
                         )
-                        .onChange(of: viewModel.inputText) { oldValue, newValue in
-                            let maxCharsPerLine = 28
-                            let formatted = wrapLines(newValue, maxCharsPerLine: maxCharsPerLine)
-                            
-                            
-                            if formatted != newValue {
-                                DispatchQueue.main.async {
-                                    viewModel.inputText = formatted
-                                }
-                            }
-                        }
                         .frame(
                             width: geometry.size.width,
                             height: geometry.size.width,
@@ -53,12 +79,11 @@ struct ContentView: View {
                         .background(Color.black)
                         .cornerRadius(12)
                         .shadow(radius: 5)
-                        
                     }
                     .frame(height: geometry.size.width)
                 }
                 .frame(maxHeight: UIScreen.main.bounds.width)
-                
+
                 // --- Área 2: Menu acima da lista ---
                 HStack(spacing: 20) {
                     // Botão de Gravação
@@ -72,48 +97,66 @@ struct ContentView: View {
                     }
                     .buttonStyle(.bordered)
                     .tint(viewModel.isRecording ? .red : .blue)
-                    .disabled(viewModel.inputText.trimmingCharacters(in: .whitespaces).isEmpty)
+
+                    // Botão "Play All" (aplica à playlist ativa)
+                    Button(action: {
+                        // play all da playlist ativa — simples iteração
+                        playAllActive()
+                    }) {
+                        Label("Play All", systemImage: "play.fill")
+                    }
+                    .buttonStyle(.bordered)
+                    .tint(.green)
+
+                    Spacer()
                 }
-                
-                // --- Área 3: Lista de frases ---
+                .padding(.horizontal)
+
+                // --- Área 3: Lista de gravações da playlist ativa ---
                 FraseListView(viewModel: viewModel)
             }
             .ignoresSafeArea(.keyboard)
             .navigationTitle("Write and Recorder")
             .navigationBarTitleDisplayMode(.inline)
             .onAppear {
-                viewModel.loadFrases()
+                viewModel.loadLibrary()
             }
             .onTapGesture {
-                UIApplication.shared.hideKeyboard()
+                hideKeyboard()
+            }
+            }
+            .sheet(isPresented: $showNewPlaylistSheet) {
+                NewPlaylistView(viewModel: viewModel, isPresented: $showNewPlaylistSheet)
+            }
+            // (Opcional) sheet para gerenciar/renomear/excluir playlists
+            .sheet(isPresented: $showManagePlaylists) {
+                ManagePlaylistsView(viewModel: viewModel, isPresented: $showManagePlaylists)
             }
         }
-    }
-    
     // Função que ajusta o tamanho da fonte
     private func fontSize(for text: String) -> CGFloat {
         return 28
     }
-    
-    // Função que quebra cada linha em pedaços de tamanho máximo
-    private func wrapLines(_ text: String, maxCharsPerLine: Int) -> String {
-        // Preserva linhas existentes
-        let lines = text.split(separator: "\n", omittingEmptySubsequences: false).map(String.init)
-        var wrappedLines: [String] = []
-        
-        for line in lines {
-            var current = line
-            // Quebra linhas maiores que maxCharsPerLine
-            while current.count > maxCharsPerLine {
-                let splitIndex = current.index(current.startIndex, offsetBy: maxCharsPerLine)
-                let chunk = String(current[..<splitIndex])
-                wrappedLines.append(chunk)
-                current = String(current[splitIndex...])
+
+// ... dentro da struct ContentView { ... }
+
+    private func playAllActive() {
+        // agora viewModel está disponível porque esta função está dentro de ContentView
+        let recordings = viewModel.activeRecordings
+        guard !recordings.isEmpty else { return }
+
+        var delay: TimeInterval = 0
+        for rec in recordings {
+            let file = rec.audioFileName
+            DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+                viewModel.playAudio(named: file)
             }
-            // Adiciona o que restou da linha (pode ser vazio)
-            wrappedLines.append(current)
+            delay += 3.5
         }
-        
-        return wrappedLines.joined(separator: "\n")
     }
-}
+
+    }
+
+    
+
+

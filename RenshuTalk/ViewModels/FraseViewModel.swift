@@ -5,19 +5,92 @@
 //  Created by Dalvlos on 2025/07/12.
 //
 
+//
+//  FraseViewModel.swift
+//  RenshuTalk
+//
+//  Atualizado para suportar playlists (listas independentes).
+//
+
 import Foundation
 import AVFoundation
 
 class FraseViewModel: NSObject, ObservableObject, AVAudioPlayerDelegate {
+    // texto em edição
     @Published var inputText = ""
-    @Published var frases: [FraseComAudio] = []
+    // biblioteca com playlists
+    @Published var library: UserLibrary = UserLibrary(playlists: [])
+    // id da playlist ativa
+    @Published var activePlaylistID: UUID?
+
     @Published var isRecording = false
 
     private var audioPlayer: AVAudioPlayer?
     @Published var recorder = AudioRecorder()
 
-    // controla qual índice está sendo reproduzido no modo "playAll"
-    private var currentPlayIndex: Int?
+    // MARK: - Inicialização
+    override init() {
+        super.init()
+        loadLibrary()
+        // se não houver playlists, cria uma padrão
+        if library.playlists.isEmpty {
+            createPlaylist(name: "Default")
+        }
+        // garante que existe uma playlist ativa
+        if activePlaylistID == nil {
+            activePlaylistID = library.playlists.first?.id
+        }
+    }
+
+    // MARK: - Acesso à playlist ativa
+    var activePlaylistIndex: Int? {
+        guard let id = activePlaylistID else { return nil }
+        return library.playlists.firstIndex { $0.id == id }
+    }
+
+    var activePlaylistName: String {
+        if let idx = activePlaylistIndex {
+            return library.playlists[idx].name
+        } else {
+            return "Nenhuma lista"
+        }
+    }
+
+    var activeRecordings: [Recording] {
+        guard let idx = activePlaylistIndex else { return [] }
+        return library.playlists[idx].recordings
+    }
+
+    // MARK: - Playlists
+    func createPlaylist(name: String) {
+        let playlist = Playlist(id: UUID(), name: name, recordings: [])
+        library.playlists.append(playlist)
+        // torna a nova playlist ativa
+        activePlaylistID = playlist.id
+        saveLibrary()
+    }
+
+    func selectPlaylist(id: UUID) {
+        guard library.playlists.contains(where: { $0.id == id }) else { return }
+        activePlaylistID = id
+    }
+
+    func renamePlaylist(id: UUID, newName: String) {
+        guard let idx = library.playlists.firstIndex(where: { $0.id == id }) else { return }
+        library.playlists[idx].name = newName
+        saveLibrary()
+    }
+
+    func deletePlaylist(at index: Int) {
+        guard library.playlists.indices.contains(index) else { return }
+        let removingID = library.playlists[index].id
+        library.playlists.remove(at: index)
+        // se removida a playlist ativa, atualiza a ativa
+        if activePlaylistID == removingID {
+            activePlaylistID = library.playlists.first?.id
+        }
+        saveLibrary()
+    }
 
     // MARK: - Gravação
     func toggleRecording() {
@@ -25,23 +98,31 @@ class FraseViewModel: NSObject, ObservableObject, AVAudioPlayerDelegate {
         if isRecording {
             recorder.stopRecording()
             isRecording = false
-            salvarFrase()
+            salvarGravacaoNaPlaylist()
         } else {
             recorder.startRecording(for: filename)
             isRecording = true
         }
     }
 
-    func salvarFrase() {
-        guard !inputText.isEmpty, let file = recorder.recordingURL else { return }
-        let novaFrase = FraseComAudio(id: UUID(), texto: inputText, audioFileName: file.lastPathComponent)
-        frases.append(novaFrase)
-        saveFrases()
+    private func salvarGravacaoNaPlaylist() {
+        guard !inputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
+              let file = recorder.recordingURL,
+              let idx = activePlaylistIndex else {
+            // limpa URL se necessário
+            recorder.recordingURL = nil
+            return
+        }
+
+        let nova = Recording(id: UUID(), text: inputText, audioFileName: file.lastPathComponent, dateCreated: Date())
+        library.playlists[idx].recordings.append(nova)
+        saveLibrary()
+        // limpa campo e URL atual de gravação
         inputText = ""
         recorder.recordingURL = nil
     }
 
-    // MARK: - Reprodução simples
+    // MARK: - Reprodução
     func playAudio(named filename: String) {
         stopPlayback()
         let path = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
@@ -52,97 +133,52 @@ class FraseViewModel: NSObject, ObservableObject, AVAudioPlayerDelegate {
             audioPlayer?.delegate = self
             audioPlayer?.prepareToPlay()
             audioPlayer?.play()
-            currentPlayIndex = nil // reprodução isolada
         } catch {
             print("Erro ao reproduzir áudio: \(error)")
         }
     }
 
-    // MARK: - Play All (sequencial)
-    func playAll() {
-        guard !frases.isEmpty else { return }
-        playSequentially(index: 0)
-    }
-
-    private func playSequentially(index: Int) {
-        guard index < frases.count else {
-            // terminou todas
-            currentPlayIndex = nil
-            return
-        }
-
-        currentPlayIndex = index
-        let frase = frases[index]
-        let path = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-        let fileURL = path.appendingPathComponent(frase.audioFileName)
-
-        do {
-            audioPlayer = try AVAudioPlayer(contentsOf: fileURL)
-            audioPlayer?.delegate = self
-            audioPlayer?.prepareToPlay()
-            audioPlayer?.play()
-        } catch {
-            print("Erro ao reproduzir áudio sequencialmente: \(error)")
-            // tenta próximo se falhar
-            playSequentially(index: index + 1)
-        }
-    }
-
-    // AVAudioPlayerDelegate — chamado quando um áudio termina
-    func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
-        if let idx = currentPlayIndex {
-            playSequentially(index: idx + 1)
-        }
-    }
-
-    
     func stopPlayback() {
         audioPlayer?.stop()
         audioPlayer = nil
-        currentPlayIndex = nil
     }
 
-    // MARK: - Gerenciamento
-    func deleteFrase(at index: Int) {
-        let frase = frases[index]
-        let path = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-        let audioURL = path.appendingPathComponent(frase.audioFileName)
-
-        do {
-            if FileManager.default.fileExists(atPath: audioURL.path) {
-                try FileManager.default.removeItem(at: audioURL)
-            }
-        } catch {
-            print("Erro ao deletar áudio: \(error)")
-        }
-
-        frases.remove(at: index)
-        saveFrases()
+    func deleteRecording(at index: Int) {
+        guard let idx = activePlaylistIndex,
+              library.playlists[idx].recordings.indices.contains(index) else { return }
+        let fileName = library.playlists[idx].recordings[index].audioFileName
+        // tenta remover arquivo físico
+        let doc = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+        let fileURL = doc.appendingPathComponent(fileName)
+        try? FileManager.default.removeItem(at: fileURL)
+        // remove da lista
+        library.playlists[idx].recordings.remove(at: index)
+        saveLibrary()
     }
 
-    func createNewPlaylist() {
-        frases.removeAll()
-        saveFrases()
+    // MARK: - salvar/carregar biblioteca
+    private func libraryURL() -> URL {
+        return FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("library.json")
     }
 
-    // MARK: - Persistência
-    func loadFrases() {
-        let url = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("frases.json")
+    func loadLibrary() {
+        let url = libraryURL()
         do {
             let data = try Data(contentsOf: url)
-            frases = try JSONDecoder().decode([FraseComAudio].self, from: data)
+            library = try JSONDecoder().decode(UserLibrary.self, from: data)
         } catch {
-            print("Erro ao carregar frases.")
+            // sem arquivo -> começa vazio (já tratado no init)
+            print("Nenhuma library existente: \(error.localizedDescription)")
         }
     }
 
-    private func saveFrases() {
-        let url = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("frases.json")
+    func saveLibrary() {
+        let url = libraryURL()
         do {
-            let data = try JSONEncoder().encode(frases)
+            let data = try JSONEncoder().encode(library)
             try data.write(to: url)
         } catch {
-            print("Erro ao salvar frases.")
+            print("Erro ao salvar library: \(error)")
         }
     }
 }
