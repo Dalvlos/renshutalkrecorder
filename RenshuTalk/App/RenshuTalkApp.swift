@@ -9,11 +9,19 @@ import SwiftUI
 
 @main
 struct RenshuTalkApp: App {
+    
+    @AppStorage("hasSeenWelcome") private var hasSeenWelcome: Bool = false
+
     var body: some Scene {
         WindowGroup {
-            ContentView()
-                .preferredColorScheme(.dark)
+            Group {
+                if hasSeenWelcome {
+                    ContentView()
+                } else {
+                    WelcomeView()
+                }
+            }
+            .preferredColorScheme(.dark)
         }
-        
     }
 }
