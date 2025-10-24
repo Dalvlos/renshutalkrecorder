@@ -4,7 +4,7 @@
 //
 //  Created by Dalvlos on 2025/08/12.
 //
-import SwiftUI
+/*import SwiftUI
 
 class LibraryViewModel: ObservableObject {
     @Published var library: UserLibrary = UserLibrary(playlists: [])
@@ -26,3 +26,4 @@ class LibraryViewModel: ObservableObject {
         // salvar no JSON local
     }
 }
+*/

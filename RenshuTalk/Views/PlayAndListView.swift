@@ -7,7 +7,7 @@
 import SwiftUI
 
 struct PlayAndListView: View {
-    @ObservedObject var viewModel: FraseViewModel
+    @ObservedObject var viewModel: PhraseViewModel
 
     var body: some View {
         HStack(spacing: 20) {

@@ -8,14 +8,13 @@
 
 import SwiftUI
 
-struct FraseListView: View {
-    @ObservedObject var viewModel: FraseViewModel
+struct PhraseListView: View {
+    @ObservedObject var viewModel: PhraseViewModel
 
     var body: some View {
         List(viewModel.frases.indices, id: \.self) { index in
-            VStack(alignment: .leading) {
-                Text(viewModel.frases[index].texto)
-                    .font(.headline)
+            HStack {
+                
                 Button(action: {
                     viewModel.playAudio(named: viewModel.frases[index].audioFileName)
                 }) {
@@ -23,6 +22,12 @@ struct FraseListView: View {
                         .font(.title2)
                         .foregroundColor(.blue)
                 }
+                
+                Text(viewModel.frases[index].texto)
+                    .font(.headline)
+                    
+                
+                Spacer()
 
             }
 

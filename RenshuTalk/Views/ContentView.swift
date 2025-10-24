@@ -14,8 +14,9 @@ extension UIApplication {
 }
 
 struct ContentView: View {
-    @StateObject private var viewModel = FraseViewModel()
+    @StateObject private var viewModel = PhraseViewModel()
     @State private var isMenuOpen = false
+    let listName: String
     
     var body: some View {
         NavigationView {
@@ -76,13 +77,14 @@ struct ContentView: View {
                 }
                 
                 // --- Área 3: Lista de frases ---
-                FraseListView(viewModel: viewModel)
+                PhraseListView(viewModel: viewModel)
             }
             .ignoresSafeArea(.keyboard)
             .navigationTitle("Write and Recorder")
             .navigationBarTitleDisplayMode(.inline)
             .onAppear {
                 viewModel.loadFrases()
+                
             }
             .onTapGesture {
                 UIApplication.shared.hideKeyboard()
