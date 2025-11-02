@@ -1,9 +1,3 @@
-//
-//  AudioRecorder.swift
-//  RenshuTalk
-//
-//  Created by Dalvlos on 2025/07/03.
-//
 
 import Foundation
 import AVFoundation
@@ -18,26 +12,39 @@ class AudioRecorder: NSObject, ObservableObject {
 
         let settings: [String: Any] = [
             AVFormatIDKey: Int(kAudioFormatMPEG4AAC),
-            AVSampleRateKey: 12000,
+            AVSampleRateKey: 24000,
             AVNumberOfChannelsKey: 1,
             AVEncoderAudioQualityKey: AVAudioQuality.high.rawValue
         ]
 
-        do {
-            let session = AVAudioSession.sharedInstance()
+        let session = AVAudioSession.sharedInstance()
 
-            // Configuração para gravar e reproduzir, respeitando bluetooth se disponível
-            try session.setCategory(.playAndRecord, mode: .voiceChat, options: [.allowBluetooth, .allowBluetoothA2DP])
-            try session.setActive(true)
+        
+        session.requestRecordPermission { [weak self] granted in
+            guard granted else {
+                print("Permissão de gravação negada.")
+                // TODO: Informar o usuário na UI que a permissão é necessária
+                return
+            }
+            
+            
+            
+            DispatchQueue.main.async {
+                do {
+                    
+                    try session.setCategory(.playAndRecord, mode: .default, options: [.allowBluetooth, .allowBluetoothA2DP])
+                    try session.setActive(true)
 
-            recordingURL = fileURL
-            audioRecorder = try AVAudioRecorder(url: fileURL, settings: settings)
-            audioRecorder?.prepareToRecord()
-            audioRecorder?.record()
+                    self?.recordingURL = fileURL
+                    self?.audioRecorder = try AVAudioRecorder(url: fileURL, settings: settings)
+                    self?.audioRecorder?.prepareToRecord()
+                    self?.audioRecorder?.record()
 
-            print("Gravando em: \(fileURL)")
-        } catch {
-            print("Erro ao iniciar gravação: \(error.localizedDescription)")
+                    print("Gravando em: \(fileURL)")
+                } catch {
+                    print("Erro ao iniciar gravação: \(error.localizedDescription)")
+                }
+            }
         }
     }
 
@@ -45,6 +52,7 @@ class AudioRecorder: NSObject, ObservableObject {
         audioRecorder?.stop()
         audioRecorder = nil
 
+        
         if let url = recordingURL {
             let exists = FileManager.default.fileExists(atPath: url.path)
             let size = (try? FileManager.default.attributesOfItem(atPath: url.path)[.size]) as? Int ?? 0
@@ -52,5 +60,4 @@ class AudioRecorder: NSObject, ObservableObject {
         }
     }
 }
-
 

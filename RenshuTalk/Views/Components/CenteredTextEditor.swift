@@ -1,9 +1,4 @@
-//
-//  CenteredTextEditor.swift
-//  RenshuTalk
-//
-//  Created by Dalvlos on 2025/08/29.
-//
+
 
 
 import SwiftUI
@@ -11,7 +6,7 @@ import SwiftUI
 struct CenteredTextEditor: UIViewRepresentable {
     @Binding var text: String
     var fontSize: CGFloat
-    var maxWidth: CGFloat = 300 // Personalize conforme o layout da sua tela
+    var maxWidth: CGFloat = 300
     var horizontalPadding: CGFloat = 20
 
     func makeUIView(context: Context) -> UITextView {
@@ -38,12 +33,12 @@ struct CenteredTextEditor: UIViewRepresentable {
         uiView.textContainer.lineFragmentPadding = horizontalPadding
         uiView.textContainer.lineBreakMode = .byWordWrapping
 
-        // Limite máximo de largura
+        
         let limitedWidth = min(uiView.frame.width, maxWidth)
         let textHeight = uiView.sizeThatFits(CGSize(width: limitedWidth, height: .greatestFiniteMagnitude)).height
         let viewHeight = uiView.frame.height
 
-        // Centralização vertical quando possível
+       
         if textHeight <= viewHeight {
             let topInset = max((viewHeight - textHeight) / 2, 0)
             uiView.textContainerInset = UIEdgeInsets(top: topInset, left: 0, bottom: 0, right: 0)
