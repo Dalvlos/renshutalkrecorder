@@ -7,24 +7,25 @@
 import SwiftUI
 
 struct HomeView: View {
-    enum Destination: Hashable {
-        case newList
-        case contentView(listName: String)
-    }
-
-    @State private var path: [Destination] = []
+    // 💡 Usa o ViewModel para carregar os dados
+    @StateObject private var viewModel = PhraseViewModel()
+    
+    // Estado para apresentar o menu de seleção
+    @State private var isShowingListSelector = false
 
     var body: some View {
-        NavigationStack(path: $path) {
+        // Usa o NavigationView para o título, sem a complexidade do NavigationStack
+        NavigationView {
             VStack(spacing: 40) {
                 Spacer()
 
                 Text("Minhas Gravações")
                     .font(.largeTitle.bold())
                     .padding(.bottom, 20)
-
-                Button("➕ Criar nova lista") {
-                    path.append(.newList)
+                
+                // 1. Botão "Criar" chama a folha de seleção
+                Button("➕ Gerenciar / Criar Lista") {
+                    isShowingListSelector = true
                 }
                 .font(.headline)
                 .frame(maxWidth: .infinity)
@@ -32,32 +33,33 @@ struct HomeView: View {
                 .background(Color.blue.opacity(0.8))
                 .foregroundColor(.white)
                 .cornerRadius(12)
-
-                Button("📁 Acessar lista existente") {
-                    // Por enquanto, podemos deixar isso para depois
+                
+                // 2. Botão "Acessar" leva à tela principal se uma lista estiver carregada
+                // Se o viewModel carregar a lista corretamente no init, este botão pode
+                // levar o usuário direto.
+                NavigationLink(destination: ContentView()) {
+                    Text("▶️ Abrir Última Lista: \(viewModel.listaAtual?.name ?? "Carregando...")")
+                        .font(.headline)
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.green.opacity(0.8))
+                        .foregroundColor(.white)
+                        .cornerRadius(12)
                 }
-                .font(.headline)
-                .frame(maxWidth: .infinity)
-                .padding()
-                .background(Color.green.opacity(0.8))
-                .foregroundColor(.white)
-                .cornerRadius(12)
+                .disabled(viewModel.listaAtual == nil) // Desabilita se não há lista
 
                 Spacer()
             }
             .padding()
-            .navigationBarHidden(true)
-            .navigationDestination(for: Destination.self) { destination in
-                switch destination {
-                case .newList:
-                    // Passa o binding do path para poder navegar de dentro da NewListView
-                    NewListView(path: $path)
-
-                case .contentView(let listName):
-                    // Abre a tela principal já com a lista criada
-                    ContentView(listName: listName)
-                }
+            // 💡 Apresenta o menu de listas quando solicitado
+            .sheet(isPresented: $isShowingListSelector) {
+                // É CRUCIAL passar o mesmo objeto viewModel
+                ListSelectionView(viewModel: viewModel)
             }
+            // 💡 Remove a barra de navegação principal, mas adiciona o título
+            .navigationTitle("Início")
         }
+        // CRUCIAL: Passa o ViewModel para a ContentView quando navegamos
+        .environmentObject(viewModel)
     }
 }

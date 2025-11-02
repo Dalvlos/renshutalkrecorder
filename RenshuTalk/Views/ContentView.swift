@@ -15,54 +15,40 @@ extension UIApplication {
 
 struct ContentView: View {
     @StateObject private var viewModel = PhraseViewModel()
-    @State private var isMenuOpen = false
-    let listName: String
+    @State private var isShowingListSelector = false
+    // ❌ 'isMenuOpen' removido (não estava sendo usado)
+    // ❌ 'listName' removido (não estava sendo inicializado e não é necessário aqui)
     
     var body: some View {
         NavigationView {
             VStack(spacing: 16) {
                 
-                // --- Área 1: Tela 1:1 estilo Instagram ---
-                GeometryReader { geometry in
-                    ZStack {
-                        Rectangle()
-                            .fill(Color.black.opacity(0.1))
-                            .aspectRatio(1, contentMode: .fit)
-                            .cornerRadius(16)
-                            .shadow(radius: 3)
-                        
-                        CenteredTextEditor(
-                            text: $viewModel.inputText,
-                            fontSize: fontSize(for: viewModel.inputText)
-                        )
-                        .onChange(of: viewModel.inputText) { oldValue, newValue in
-                            let maxCharsPerLine = 28
-                            let formatted = wrapLines(newValue, maxCharsPerLine: maxCharsPerLine)
-                            
-                            
-                            if formatted != newValue {
-                                DispatchQueue.main.async {
-                                    viewModel.inputText = formatted
-                                }
-                            }
+                // --- Área 1: Tela 1:1 (Simplificada) ---
+                // O GeometryReader e o ZStack complexos não são necessários.
+                // Podemos atingir o mesmo resultado (um quadrado 1:1) assim:
+                CenteredTextEditor(
+                    text: $viewModel.inputText,
+                    fontSize: fontSize(for: viewModel.inputText)
+                )
+                .onChange(of: viewModel.inputText) { oldValue, newValue in
+                    let maxCharsPerLine = 28
+                    let formatted = wrapLines(newValue, maxCharsPerLine: maxCharsPerLine)
+                    
+                    if formatted != newValue {
+                        DispatchQueue.main.async {
+                            viewModel.inputText = formatted
                         }
-                        .frame(
-                            width: geometry.size.width,
-                            height: geometry.size.width,
-                            alignment: .center
-                        )
-                        .background(Color.black)
-                        .cornerRadius(12)
-                        .shadow(radius: 5)
-                        
                     }
-                    .frame(height: geometry.size.width)
                 }
-                .frame(maxHeight: UIScreen.main.bounds.width)
+                .background(Color.black)
+                .cornerRadius(12)
+                .shadow(radius: 5)
+                .aspectRatio(1, contentMode: .fit) // 👈 Isso força o View a ser 1:1
+                
                 
                 // --- Área 2: Menu acima da lista ---
                 HStack(spacing: 20) {
-                    // Botão de Gravação
+                    // Botão de Gravação (igual, já estava correto)
                     Button(action: {
                         viewModel.toggleRecording()
                     }) {
@@ -77,15 +63,17 @@ struct ContentView: View {
                 }
                 
                 // --- Área 3: Lista de frases ---
+                // Esta View (PhraseListView) também precisará ser atualizada
+                // para ler de `viewModel.listaAtual?.phrases`
                 PhraseListView(viewModel: viewModel)
             }
             .ignoresSafeArea(.keyboard)
-            .navigationTitle("Write and Recorder")
+            .navigationTitle("Write and Recorder") // 👈 Recomendo usar o nome da lista aqui
+            // .navigationTitle(viewModel.listaAtual?.name ?? "Carregando...")
             .navigationBarTitleDisplayMode(.inline)
-            .onAppear {
-                viewModel.loadFrases()
-                
-            }
+            // ❌ Bloco .onAppear REMOVIDO
+            // O @StateObject já chama o init() do ViewModel,
+            // que por sua vez já chama o loadAllData().
             .onTapGesture {
                 UIApplication.shared.hideKeyboard()
             }
@@ -97,7 +85,7 @@ struct ContentView: View {
         return 28
     }
     
-    // Função que quebra cada linha em pedaços de tamanho máximo
+    // Função que quebra cada linha (lógica mantida)
     private func wrapLines(_ text: String, maxCharsPerLine: Int) -> String {
         // Preserva linhas existentes
         let lines = text.split(separator: "\n", omittingEmptySubsequences: false).map(String.init)

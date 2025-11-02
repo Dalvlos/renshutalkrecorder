@@ -22,7 +22,7 @@ struct RenshuTalkApp: App {
         WindowGroup {
             Group {
                 if hasSeenWelcome {
-                    HomeView()
+                    ContentView()
                 } else {
                     WelcomeView()
                 }
