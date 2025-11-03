@@ -16,6 +16,7 @@ struct ContentView: View {
             
             VStack(spacing: 20) {
                 
+               
                 
                 CenteredTextEditor(
                     text: $viewModel.inputText,
@@ -31,22 +32,27 @@ struct ContentView: View {
                     let formatted = wrapLines(newValue, maxCharsPerLine: maxCharsPerLine)
                     
                     if formatted != newValue {
-                        
                         if oldValue != formatted {
-                                viewModel.inputText = formatted
+                            viewModel.inputText = formatted
                         }
                     }
                 }
                 .frame(maxWidth: .infinity, minHeight: 375, maxHeight: 375)
                 .background(Color.black)
                 .cornerRadius(12)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(Color.white.opacity(0.5), lineWidth: 2)
+                )
                 .shadow(radius: 5)
                 .clipped()
                 
                 
+                
+                
                 Button(action: {
-                     
-                        viewModel.toggleRecording()
+                    
+                    viewModel.toggleRecording()
                     
                 }) {
                     Image(systemName: viewModel.isRecording ? "stop.circle.fill" : "mic.circle.fill")
@@ -56,8 +62,8 @@ struct ContentView: View {
                         .frame(width: 55, height: 55)
                         .scaleEffect(viewModel.isRecording ? 1.2 : 1.0)
                 }
-
-               
+                
+                
                 .disabled(viewModel.inputText.trimmingCharacters(in: .whitespaces).isEmpty && !viewModel.isRecording)
                 
                 
@@ -69,7 +75,7 @@ struct ContentView: View {
             .navigationTitle(viewModel.listaAtual?.name ?? "Nova Lista")
             .navigationBarTitleDisplayMode(.inline)
             
-           
+            
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button { isShowingListSelector = true }
@@ -87,22 +93,19 @@ struct ContentView: View {
                 ListSelectionView()
             }
             .onTapGesture {
-                            hideKeyboard()
-                            isTextFieldFocused = false
-                        }
+                hideKeyboard()
+                isTextFieldFocused = false
+            }
             
-                    }
+        }
         
-            .onChange(of: viewModel.isRecording) { oldValue, isRecording in
-                if isRecording {
-                    hideKeyboard()
-                }
+        .onChange(of: viewModel.isRecording) { oldValue, isRecording in
+            if isRecording {
+                hideKeyboard()
             }
         }
     }
-    
-   
-
+}
     // 1. Funções de Layout
 // 1. Funções de Layout
 private func fontSize(for text: String) -> CGFloat {
