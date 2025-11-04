@@ -14,11 +14,11 @@ struct ListSelectionView: View {
         NavigationView {
             List {
                 
-                Section(header: Text("Criar Nova Lista")) {
+                Section(header: Text("Create New Play List")) {
                     HStack {
-                        TextField("Nome da Nova Lista", text: $newListName)
+                        TextField("List Name", text: $newListName)
                         
-                        Button("Criar") {
+                        Button("Create") {
                             guard !newListName.trimmingCharacters(in: .whitespaces).isEmpty else { return }
                             
                             viewModel.criarNovaLista(nome: newListName)
@@ -31,7 +31,7 @@ struct ListSelectionView: View {
                 }
 
                 
-                Section(header: Text("Minhas Listas")) {
+                Section(header: Text("My play list")) {
                     
                     ForEach(viewModel.todasAsListas) { list in
                         HStack {
@@ -52,13 +52,13 @@ struct ListSelectionView: View {
                     .onDelete(perform: deleteLists)
                 }
             }
-            .navigationTitle("Gerenciar Listas")
+            .navigationTitle("Manager Contents")
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     EditButton()
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Fechar") {
+                    Button("Close") {
                         dismiss()
                     }
                 }

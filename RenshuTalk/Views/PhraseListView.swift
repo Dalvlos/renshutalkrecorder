@@ -33,7 +33,7 @@ struct PhraseListView: View {
                 .onDelete(perform: deleteItems)
                 
             } else {
-                Text("Nenhuma lista selecionada")
+                Text("Nothing Selected")
                     .foregroundColor(.gray)
                     .italic()
             }
@@ -47,7 +47,7 @@ struct PhraseListView: View {
     
     
     private func togglePlayback(for phrase: PhraseItem) {
-        print("Tentando reproduzir áudio para:", phrase.audioFileName)
+        print("Trying to Play:", phrase.audioFileName)
         if viewModel.currentPlayingID == phrase.id {
             viewModel.stopPlayback()
         } else {

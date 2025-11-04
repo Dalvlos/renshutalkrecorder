@@ -23,7 +23,7 @@ struct WelcomeView: View {
                     .fontWeight(.bold)
             }
 
-            Text("Digite uma frase e grave sua leitura. Pratique pronúncia e salve gravações.")
+            Text("Type a sentence and record your reading. Practice pronunciation and save your recordings.")
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 32)
 
@@ -34,7 +34,7 @@ struct WelcomeView: View {
                     
                     handleContinue()
                 }) {
-                    Text("Começar")
+                    Text("Start")
                         .font(.headline)
                         .frame(maxWidth: .infinity)
                         .padding()
@@ -48,7 +48,7 @@ struct WelcomeView: View {
                     
                     handleContinue()
                 }) {
-                    Text("Pular")
+                    Text("Jump")
                         .foregroundColor(.secondary)
                 }
             }
@@ -68,7 +68,7 @@ struct WelcomeView: View {
             
             
             if viewModel.todasAsListas.isEmpty {
-                viewModel.criarNovaLista(nome: "Minhas Frases")
+                viewModel.criarNovaLista(nome: "My Phrases")
             }
         }
     }

@@ -6,47 +6,47 @@ import SwiftUI
 
 
 struct ContentView: View {
-    
     @EnvironmentObject var viewModel: PhraseViewModel
     @State private var isShowingListSelector = false
     @FocusState private var isTextFieldFocused: Bool
-    
+    @State private var userText = ""
+
     var body: some View {
         NavigationView {
             
             VStack(spacing: 20) {
                 
                
-                
-                CenteredTextEditor(
-                    text: $viewModel.inputText,
-                    fontSize: fontSize(for: viewModel.inputText)
-                )
-                .transaction { transaction in
-                    transaction.animation = nil
-                }
-                .focused($isTextFieldFocused)
-                .onChange(of: viewModel.inputText) { oldValue, newValue in
-                    let maxCharsPerLine = 30
-                    guard newValue.count >= oldValue.count else { return }
-                    let formatted = wrapLines(newValue, maxCharsPerLine: maxCharsPerLine)
-                    
-                    if formatted != newValue {
-                        if oldValue != formatted {
-                            viewModel.inputText = formatted
+                    ZStack(){
+                        CenteredTextEditor(
+                            text: $viewModel.inputText,
+                            fontSize: fontSize(for: viewModel.inputText)
+                        )
+                        .transaction { transaction in
+                            transaction.animation = nil
                         }
+                        .focused($isTextFieldFocused)
+                        .onChange(of: viewModel.inputText) { oldValue, newValue in
+                            let maxCharsPerLine = 30
+                            guard newValue.count >= oldValue.count else { return }
+                            let formatted = wrapLines(newValue, maxCharsPerLine: maxCharsPerLine)
+                            
+                            if formatted != newValue {
+                                if oldValue != formatted {
+                                    viewModel.inputText = formatted
+                                }
+                            }
+                        }
+                        .frame(maxWidth: .infinity, minHeight: 375, maxHeight: 375)
+                        .background(Color.black)
+                        .cornerRadius(12)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 12)
+                                .stroke(Color.white.opacity(0.5), lineWidth: 2)
+                        )
+                        .shadow(radius: 5)
+                        .clipped()
                     }
-                }
-                .frame(maxWidth: .infinity, minHeight: 375, maxHeight: 375)
-                .background(Color.black)
-                .cornerRadius(12)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 12)
-                        .stroke(Color.white.opacity(0.5), lineWidth: 2)
-                )
-                .shadow(radius: 5)
-                .clipped()
-                
                 
                 
                 
@@ -72,7 +72,7 @@ struct ContentView: View {
             .frame(maxWidth: .infinity, alignment: .center)
             .padding(.horizontal)
             .ignoresSafeArea(.keyboard)
-            .navigationTitle(viewModel.listaAtual?.name ?? "Nova Lista")
+            .navigationTitle(viewModel.listaAtual?.name ?? "New List")
             .navigationBarTitleDisplayMode(.inline)
             
             
@@ -84,7 +84,7 @@ struct ContentView: View {
                 
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: { viewModel.playAll() }) {
-                        Label("Tocar Tudo", systemImage: "speaker.wave.3.fill")
+                        Label("Tocar Tudo", systemImage: "play.fill")
                     }
                     .disabled(viewModel.listaAtual?.phrases.isEmpty ?? true)
                 }
@@ -109,7 +109,7 @@ struct ContentView: View {
     // 1. Funções de Layout
 // 1. Funções de Layout
 private func fontSize(for text: String) -> CGFloat {
-    let baseSize: CGFloat = 28
+    let baseSize: CGFloat = 25
     let length = text.count
     
     switch length {
@@ -118,7 +118,7 @@ private func fontSize(for text: String) -> CGFloat {
     case 101...200: return baseSize * 0.8
     default: return baseSize * 0.7
     }
-} // ← esta chave estava faltando
+} 
 
 private func wrapLines(_ text: String, maxCharsPerLine: Int) -> String {
     let lines = text.split(separator: "\n", omittingEmptySubsequences: false).map(String.init)
