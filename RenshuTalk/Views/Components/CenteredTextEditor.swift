@@ -51,38 +51,41 @@ struct CenteredTextEditor: UIViewRepresentable {
         Coordinator(self)
     }
 
+    // Arquivo: CenteredTextEditor.swift
+
     class Coordinator: NSObject, UITextViewDelegate {
-            var parent: CenteredTextEditor
+        var parent: CenteredTextEditor
 
-            init(_ parent: CenteredTextEditor) {
-                self.parent = parent
-            }
+        init(_ parent: CenteredTextEditor) {
+            self.parent = parent
+        }
 
-            func textViewDidBeginEditing(_ textView: UITextView) {
-                // Remove o placeholder ao começar a digitar
-                if textView.textColor == UIColor.gray.withAlphaComponent(0.5) {
-                    textView.text = ""
-                    textView.textColor = .label
-                }
-            }
-
-            func textViewDidEndEditing(_ textView: UITextView) {
-                // Reaparece o placeholder se o campo estiver vazio
-                if textView.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                    textView.text = parent.placeholder
-                    textView.textColor = UIColor.gray.withAlphaComponent(0.5)
-                }
-            }
-
-            func textViewDidChange(_ textView: UITextView) {
-                if textView.textColor != UIColor.gray.withAlphaComponent(0.5) {
-                    parent.text = textView.text
-                }
-            func textViewDidChange(_ textView: UITextView) {
-                            parent.text = textView.text
-                        }
+        func textViewDidBeginEditing(_ textView: UITextView) {
+            // Remove o placeholder ao começar a digitar
+            if textView.textColor == UIColor.gray.withAlphaComponent(0.5) {
+                textView.text = ""
+                textView.textColor = .label
             }
         }
+
+        func textViewDidEndEditing(_ textView: UITextView) {
+            // Reaparece o placeholder se o campo estiver vazio
+            if textView.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                textView.text = parent.placeholder
+                textView.textColor = UIColor.gray.withAlphaComponent(0.5)
+            }
+        }
+
+        // ✅ CORRIGIDO: Agora esta é a única definição da função
+        func textViewDidChange(_ textView: UITextView) {
+            // Apenas atualiza o binding se não estivermos exibindo o placeholder
+            if textView.textColor != UIColor.gray.withAlphaComponent(0.5) {
+                parent.text = textView.text
+            }
+            // Se a cor for o placeholder, o `parent.text` é atualizado como string vazia
+            // (Isso é tratado em textViewDidEndEditing)
+        }
+    }
     
     private func fontSize(for text: String) -> CGFloat {
         let baseSize: CGFloat = 28

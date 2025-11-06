@@ -3,7 +3,7 @@ import SwiftUI
 
 struct PhraseListView: View {
     
-    @EnvironmentObject var viewModel: PhraseViewModel
+    @EnvironmentObject var viewModel: PhraseViewModel 
 
     var body: some View {
         List {

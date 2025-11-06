@@ -52,6 +52,12 @@ class AudioRecorder: NSObject, ObservableObject {
         audioRecorder?.stop()
         audioRecorder = nil
 
+        do {
+            try AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
+            print("Sessão de áudio desativada (Gravação concluída).")
+        } catch {
+            print("Erro ao desativar AVAudioSession após gravação: \(error)")
+        }
         
         if let url = recordingURL {
             let exists = FileManager.default.fileExists(atPath: url.path)

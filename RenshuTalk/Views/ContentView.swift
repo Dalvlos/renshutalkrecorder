@@ -9,9 +9,16 @@ struct ContentView: View {
     @EnvironmentObject var viewModel: PhraseViewModel
     @State private var isShowingListSelector = false
     @FocusState private var isTextFieldFocused: Bool
-    @State private var userText = ""
+
+    private var isPlaybackActive: Bool {
+        // Verifica se currentPlayingID está definido, indicando que o player está ativo
+        return viewModel.currentPlayingID != nil
+    }
+    
+
 
     var body: some View {
+       
         NavigationView {
             
             VStack(spacing: 20) {
@@ -68,6 +75,7 @@ struct ContentView: View {
                 
                 
                 PhraseListView()
+                    .environmentObject(viewModel)
             }
             .frame(maxWidth: .infinity, alignment: .center)
             .padding(.horizontal)
@@ -77,20 +85,30 @@ struct ContentView: View {
             
             
             .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button { isShowingListSelector = true }
-                    label: { Image(systemName: "list.bullet.rectangle.fill") }
-                }
-                
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: { viewModel.playAll() }) {
-                        Label("Tocar Tudo", systemImage: "play.fill")
+                        ToolbarItem(placement: .navigationBarLeading) {
+                            Button { isShowingListSelector = true }
+                            label: { Image(systemName: "list.bullet.rectangle.fill") }
+                        }
+                        
+                        ToolbarItem(placement: .navigationBarTrailing) {
+                            
+                            // 2. MODIFICAR O BOTÃO DE PLAY/STOP
+                            Button(action: {
+                                if isPlaybackActive {
+                                    viewModel.stopPlayback()
+                                } else {
+                                    viewModel.playAll()
+                                }
+                            }) {
+                                Label(isPlaybackActive ? "Stop" : "Tocar Tudo", systemImage: isPlaybackActive ? "stop.fill" : "play.fill")
+                            }
+                            // Desabilita se a lista estiver vazia E o playback não estiver ativo
+                            .disabled((viewModel.listaAtual?.phrases.isEmpty ?? true) && !isPlaybackActive)
+                        }
                     }
-                    .disabled(viewModel.listaAtual?.phrases.isEmpty ?? true)
-                }
-            }
             .sheet(isPresented: $isShowingListSelector) {
                 ListSelectionView()
+                    .environmentObject(viewModel)   
             }
             .onTapGesture {
                 hideKeyboard()
@@ -98,6 +116,8 @@ struct ContentView: View {
             }
             
         }
+        
+       
         
         .onChange(of: viewModel.isRecording) { oldValue, isRecording in
             if isRecording {

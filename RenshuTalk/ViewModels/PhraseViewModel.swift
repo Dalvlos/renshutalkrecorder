@@ -143,13 +143,16 @@ class PhraseViewModel: NSObject, ObservableObject, AVAudioPlayerDelegate {
     
     private func configureAudioSession() {
         do {
-            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
+            try AVAudioSession.sharedInstance().setCategory(
+                .playAndRecord,
+                mode: .default,
+                options: [.allowBluetooth, .allowBluetoothA2DP]
+            )
             try AVAudioSession.sharedInstance().setActive(true)
         } catch {
-            print("Erro ao configurar AVAudioSession para playback: \(error)")
+            print("Erro ao configurar AVAudioSession para PlayAndRecord: \(error)")
         }
     }
-    
     func playAudio(named filename: String, id: UUID? = nil) {
         stopPlayback()
         configureAudioSession()
@@ -214,6 +217,13 @@ class PhraseViewModel: NSObject, ObservableObject, AVAudioPlayerDelegate {
         audioPlayer = nil
         currentPlayIndex = nil
         currentPlayingID = nil
+        
+        do {
+            try AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
+            print("Sessão de áudio desativada (Playback concluído).")
+        } catch {
+            print("Erro ao desativar AVAudioSession: \(error)")
+        }
     }
     
     func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
