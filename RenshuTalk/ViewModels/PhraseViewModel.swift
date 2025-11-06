@@ -141,18 +141,39 @@ class PhraseViewModel: NSObject, ObservableObject, AVAudioPlayerDelegate {
     
     // MARK: - Reprodução de Áudio
     
+    // Arquivo: PhraseViewModel.swift (Parte 6)
+
+    // Arquivo: PhraseViewModel.swift
+
     private func configureAudioSession() {
         do {
-            try AVAudioSession.sharedInstance().setCategory(
-                .playAndRecord,
-                mode: .default,
-                options: [.allowBluetooth, .allowBluetoothA2DP]
-            )
-            try AVAudioSession.sharedInstance().setActive(true)
+            let session = AVAudioSession.sharedInstance()
+            
+            // 1. ✅ MUDANÇA CRÍTICA: Use .playAndRecord para unificar as necessidades do app.
+            try session.setCategory(.playAndRecord, mode: .default, options: [.defaultToSpeaker])
+            
+            // A opção .defaultToSpeaker garante que o áudio saia pelo alto-falante principal (e não pelo fone de ouvido).
+            
+            try session.setActive(true)
+            
         } catch {
-            print("Erro ao configurar AVAudioSession para PlayAndRecord: \(error)")
+            print("Erro ao configurar ou ativar a sessão de áudio: \(error.localizedDescription)")
         }
     }
+
+    func stopPlayback() {
+        // ...
+        audioPlayer?.stop()
+        audioPlayer = nil
+        currentPlayingID = nil
+        
+        do {
+            try AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
+        } catch {
+            print("Erro ao desativar a sessão de áudio: \(error.localizedDescription)")
+        }
+    }
+    
     func playAudio(named filename: String, id: UUID? = nil) {
         stopPlayback()
         configureAudioSession()
@@ -209,20 +230,6 @@ class PhraseViewModel: NSObject, ObservableObject, AVAudioPlayerDelegate {
         } catch {
             
             playSequentially(index: index + 1, phrases: phrases)
-        }
-    }
-    
-    func stopPlayback() {
-        audioPlayer?.stop()
-        audioPlayer = nil
-        currentPlayIndex = nil
-        currentPlayingID = nil
-        
-        do {
-            try AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
-            print("Sessão de áudio desativada (Playback concluído).")
-        } catch {
-            print("Erro ao desativar AVAudioSession: \(error)")
         }
     }
     

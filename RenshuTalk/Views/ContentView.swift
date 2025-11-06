@@ -75,7 +75,8 @@ struct ContentView: View {
                 
                 
                 PhraseListView()
-                    .environmentObject(viewModel)
+                    .id(viewModel.listaAtual?.id)
+                    
             }
             .frame(maxWidth: .infinity, alignment: .center)
             .padding(.horizontal)
@@ -108,7 +109,7 @@ struct ContentView: View {
                     }
             .sheet(isPresented: $isShowingListSelector) {
                 ListSelectionView()
-                    .environmentObject(viewModel)   
+                    
             }
             .onTapGesture {
                 hideKeyboard()

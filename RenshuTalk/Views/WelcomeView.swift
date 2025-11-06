@@ -18,7 +18,7 @@ struct WelcomeView: View {
                     .frame(width: 96, height: 96)
                     .foregroundColor(.blue)
 
-                Text("RenshuTalk")
+                Text("RenshuSpeak")
                     .font(.largeTitle)
                     .fontWeight(.bold)
             }
@@ -30,11 +30,11 @@ struct WelcomeView: View {
             Spacer()
 
             VStack(spacing: 12) {
+               
                 Button(action: {
-                    
                     handleContinue()
                 }) {
-                    Text("Start")
+                    Text("Start Practice") // ✅ Texto mais claro
                         .font(.headline)
                         .frame(maxWidth: .infinity)
                         .padding()
@@ -43,14 +43,7 @@ struct WelcomeView: View {
                         .cornerRadius(12)
                         .padding(.horizontal, 40)
                 }
-
-                Button(action: {
-                    
-                    handleContinue()
-                }) {
-                    Text("Jump")
-                        .foregroundColor(.secondary)
-                }
+                
             }
             Spacer(minLength: 20)
         }

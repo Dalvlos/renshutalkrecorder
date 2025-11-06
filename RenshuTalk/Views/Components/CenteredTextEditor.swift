@@ -15,28 +15,43 @@ struct CenteredTextEditor: UIViewRepresentable {
         textView.backgroundColor = .clear
         textView.textAlignment = .center
         textView.font = UIFont.systemFont(ofSize: fontSize)
-        textView.textColor = .label
+        //textView.textColor = .label
         textView.textContainerInset = .zero
         textView.isScrollEnabled = false
         textView.textContainer.lineFragmentPadding = 0
         textView.textContainer.lineBreakMode = .byWordWrapping
         textView.autocorrectionType = .default
         textView.autocapitalizationType = .sentences
-        textView.text = placeholder
-        textView.textColor = UIColor.gray.withAlphaComponent(0.5)
+        //textView.text = placeholder
+        //textView.textColor = UIColor.gray.withAlphaComponent(0.5)
         textView.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
         textView.setContentCompressionResistancePriority(.defaultLow, for: .vertical)
         textView.textContainerInset = UIEdgeInsets(
                     top: (textView.bounds.height - textView.font!.lineHeight) / 2,
                     left: 0, bottom: 0, right: 0
                 )
+        if text.isEmpty {
+                textView.text = placeholder
+                textView.textColor = UIColor.gray.withAlphaComponent(0.5)
+            } else {
+                textView.text = text
+                textView.textColor = .label
+            }
         return textView
     }
 
     func updateUIView(_ uiView: UITextView, context: Context) {
-        if uiView.text != text {
+        if !uiView.isFirstResponder {
+                if text.isEmpty {
+                    // Se o binding estiver vazio, mostre o placeholder
+                    uiView.text = placeholder
+                    uiView.textColor = UIColor.gray.withAlphaComponent(0.5)
+                } else {
+                    // Se o binding tiver texto, mostre o texto
                     uiView.text = text
-    }
+                    uiView.textColor = .label
+                }
+            }
     DispatchQueue.main.async {
                 let size = uiView.sizeThatFits(CGSize(width: uiView.bounds.width, height: .greatestFiniteMagnitude))
                 let textHeight = size.height
