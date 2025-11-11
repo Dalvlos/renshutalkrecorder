@@ -141,18 +141,13 @@ class PhraseViewModel: NSObject, ObservableObject, AVAudioPlayerDelegate {
     
     // MARK: - Reprodução de Áudio
     
-    // Arquivo: PhraseViewModel.swift (Parte 6)
-
-    // Arquivo: PhraseViewModel.swift
 
     private func configureAudioSession() {
         do {
             let session = AVAudioSession.sharedInstance()
             
-            // 1. ✅ MUDANÇA CRÍTICA: Use .playAndRecord para unificar as necessidades do app.
             try session.setCategory(.playAndRecord, mode: .default, options: [.defaultToSpeaker])
-            
-            // A opção .defaultToSpeaker garante que o áudio saia pelo alto-falante principal (e não pelo fone de ouvido).
+
             
             try session.setActive(true)
             

@@ -43,11 +43,11 @@ struct CenteredTextEditor: UIViewRepresentable {
     func updateUIView(_ uiView: UITextView, context: Context) {
         if !uiView.isFirstResponder {
                 if text.isEmpty {
-                    // Se o binding estiver vazio, mostre o placeholder
+                    
                     uiView.text = placeholder
                     uiView.textColor = UIColor.gray.withAlphaComponent(0.5)
                 } else {
-                    // Se o binding tiver texto, mostre o texto
+                    
                     uiView.text = text
                     uiView.textColor = .label
                 }
@@ -66,7 +66,7 @@ struct CenteredTextEditor: UIViewRepresentable {
         Coordinator(self)
     }
 
-    // Arquivo: CenteredTextEditor.swift
+    
 
     class Coordinator: NSObject, UITextViewDelegate {
         var parent: CenteredTextEditor
@@ -76,7 +76,7 @@ struct CenteredTextEditor: UIViewRepresentable {
         }
 
         func textViewDidBeginEditing(_ textView: UITextView) {
-            // Remove o placeholder ao começar a digitar
+            
             if textView.textColor == UIColor.gray.withAlphaComponent(0.5) {
                 textView.text = ""
                 textView.textColor = .label
@@ -84,21 +84,20 @@ struct CenteredTextEditor: UIViewRepresentable {
         }
 
         func textViewDidEndEditing(_ textView: UITextView) {
-            // Reaparece o placeholder se o campo estiver vazio
+            
             if textView.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                 textView.text = parent.placeholder
                 textView.textColor = UIColor.gray.withAlphaComponent(0.5)
             }
         }
 
-        // ✅ CORRIGIDO: Agora esta é a única definição da função
+        
         func textViewDidChange(_ textView: UITextView) {
-            // Apenas atualiza o binding se não estivermos exibindo o placeholder
+            
             if textView.textColor != UIColor.gray.withAlphaComponent(0.5) {
                 parent.text = textView.text
             }
-            // Se a cor for o placeholder, o `parent.text` é atualizado como string vazia
-            // (Isso é tratado em textViewDidEndEditing)
+            
         }
     }
     

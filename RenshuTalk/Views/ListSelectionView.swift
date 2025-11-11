@@ -53,7 +53,7 @@ struct ListSelectionView: View {
                     .onDelete(perform: deleteLists)
                 }
             }
-            .navigationTitle("Manager Contents")
+            .navigationTitle("Manage Contents")
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     EditButton()

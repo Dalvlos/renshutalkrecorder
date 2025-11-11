@@ -1,5 +1,5 @@
 //
-//  ContentView.swift (REFATORADO E CORRIGIDO)
+//  ContentView.swift
 //  RenshuTalk
 //
 import SwiftUI
@@ -11,7 +11,7 @@ struct ContentView: View {
     @FocusState private var isTextFieldFocused: Bool
 
     private var isPlaybackActive: Bool {
-        // Verifica se currentPlayingID está definido, indicando que o player está ativo
+        
         return viewModel.currentPlayingID != nil
     }
     
@@ -93,7 +93,7 @@ struct ContentView: View {
                         
                         ToolbarItem(placement: .navigationBarTrailing) {
                             
-                            // 2. MODIFICAR O BOTÃO DE PLAY/STOP
+                            
                             Button(action: {
                                 if isPlaybackActive {
                                     viewModel.stopPlayback()
@@ -103,7 +103,7 @@ struct ContentView: View {
                             }) {
                                 Label(isPlaybackActive ? "Stop" : "Tocar Tudo", systemImage: isPlaybackActive ? "stop.fill" : "play.fill")
                             }
-                            // Desabilita se a lista estiver vazia E o playback não estiver ativo
+                            
                             .disabled((viewModel.listaAtual?.phrases.isEmpty ?? true) && !isPlaybackActive)
                         }
                     }
@@ -127,8 +127,7 @@ struct ContentView: View {
         }
     }
 }
-    // 1. Funções de Layout
-// 1. Funções de Layout
+   
 private func fontSize(for text: String) -> CGFloat {
     let baseSize: CGFloat = 25
     let length = text.count
@@ -149,11 +148,11 @@ private func wrapLines(_ text: String, maxCharsPerLine: Int) -> String {
         var current = line
         
         while current.count > maxCharsPerLine {
-            // Procura o último espaço antes do limite
+            
             let endIndex = current.index(current.startIndex, offsetBy: maxCharsPerLine)
             var breakIndex = current[..<endIndex].lastIndex(of: " ") ?? endIndex
             
-            // Se não encontrar espaço, força a quebra (para não travar loop)
+            
             if breakIndex == current.startIndex {
                 breakIndex = endIndex
             }
@@ -161,7 +160,7 @@ private func wrapLines(_ text: String, maxCharsPerLine: Int) -> String {
             let chunk = String(current[..<breakIndex]).trimmingCharacters(in: .whitespaces)
             wrappedLines.append(chunk)
             
-            // Pula o espaço e continua
+            
             let nextIndex = current.index(after: breakIndex)
             current = String(current[nextIndex...]).trimmingCharacters(in: .whitespaces)
         }
